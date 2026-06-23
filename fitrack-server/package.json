@@ -1,0 +1,17 @@
+{
+  "name": "fitrack-server",
+  "version": "1.0.0",
+  "description": "Personal Finance Tracker",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chiku23",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
