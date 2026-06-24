@@ -3,37 +3,47 @@ import express from 'express';
 import cors from 'cors';
 import { sequelize } from './models/index.js';
 
-// Import endpoint route managers
-// Extension names (.js) are strictly required for native Node.js ES Modules execution
 import authRoutes from './routes/auth.routes.js';
 import transactionRoutes from './routes/transaction.routes.js';
+import budgetRoutes from './routes/budget.routes.js';
+import profileRoutes from './routes/profile.routes.js';
+import importRoutes from './routes/import.routes.js';
+import analyticsRoutes from './routes/analytics.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Enable cross-origin resource sharing for clients mapped under the environment file
-app.use(cors({ origin: process.env.FRONTEND_URL }));
-
-// Inbound payload processing middleware
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Application routing layer definitions
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/budgets', budgetRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/import', importRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
-// General health check verification endpoint
+// Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'FiTrack Backend running under ES Module scope' });
+  res.json({ status: 'OK', message: 'FiTrack API running', version: '2.0.0' });
 });
 
-// Structural schema verification prior to initialization
-sequelize.sync({ alter: true })
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('API Error:', err.message);
+  res.status(err.status || 500).json({
+    success: false,
+    error: err.message || 'Internal Server Error'
+  });
+});
+
+sequelize.sync()
   .then(() => {
-    console.log('Database synchronization completed successfully.');
-    app.listen(PORT, () => {
-      console.log(`Server executing operations on port ${PORT}`);
-    });
+    console.log('Database synchronized.');
+    app.listen(PORT, () => console.log(`FiTrack server running on port ${PORT}`));
   })
   .catch((error) => {
-    console.error('Database initialization phase encountered a critical failure:', error);
+    console.error('Database sync failed:', error);
   });

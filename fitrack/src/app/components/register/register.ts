@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -13,8 +13,8 @@ import { AuthService } from '../../services/auth'; // Explicitly tracks your cus
 })
 export class RegisterComponent {
   registerForm: FormGroup;
-  errorMessage: string | null = null;
-  isSubmitting = false;
+  errorMessage = signal<string | null>(null);
+  isSubmitting = signal<boolean>(false);
 
   // Strategic transactional currencies list
   currencies: string[] = ['INR', 'USD', 'EUR', 'GBP', 'AED', 'SGD', 'JPY'];
@@ -49,21 +49,21 @@ export class RegisterComponent {
       return;
     }
 
-    this.isSubmitting = true;
-    this.errorMessage = null;
+    this.isSubmitting.set(true);
+    this.errorMessage.set(null);
 
     this.authService.register(this.registerForm.value).subscribe({
       next: (response) => {
         if (response.success) {
           this.router.navigate(['/login']);
         } else {
-          this.errorMessage = response.error || 'Registration processing encountered an issue.';
+          this.errorMessage.set(response.error || 'Registration failed.');
         }
-        this.isSubmitting = false;
+        this.isSubmitting.set(false);
       },
       error: (err) => {
-        this.errorMessage = err.error?.error || 'A remote transaction processing error occurred.';
-        this.isSubmitting = false;
+        this.errorMessage.set(err.error?.error || 'A server error occurred. Please try again.');
+        this.isSubmitting.set(false);
       }
     });
   }

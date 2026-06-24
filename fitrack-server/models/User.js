@@ -23,10 +23,11 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      validate: {
-        isEmail: true,
-        notEmpty: true,
-      },
+      validate: { isEmail: true, notEmpty: true },
+    },
+    display_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     password: {
       type: DataTypes.STRING,

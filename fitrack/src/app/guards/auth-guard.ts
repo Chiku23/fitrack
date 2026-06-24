@@ -10,7 +10,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // Redirect invalid users back to the entry gateway page
+  // Redirect to login page
   router.navigate(['/login']);
   return false;
 };

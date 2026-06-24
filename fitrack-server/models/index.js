@@ -1,25 +1,28 @@
 import sequelize from '../config/database.js';
 import User from './User.js';
 import Transaction from './Transaction.js';
+import Budget from './Budget.js';
 
-// Defines one-to-many relationship mapping rules
+// User → Transactions
 User.hasMany(Transaction, {
-  foreignKey: {
-    name: 'userId',
-    allowNull: false,
-    field: 'user_id'
-  },
+  foreignKey: { name: 'userId', allowNull: false, field: 'user_id' },
   as: 'transactions',
   onDelete: 'CASCADE'
 });
-
 Transaction.belongsTo(User, {
-  foreignKey: {
-    name: 'userId',
-    allowNull: false,
-    field: 'user_id'
-  },
+  foreignKey: { name: 'userId', allowNull: false, field: 'user_id' },
   as: 'user'
 });
 
-export { sequelize, User, Transaction };
+// User → Budgets
+User.hasMany(Budget, {
+  foreignKey: { name: 'userId', allowNull: false, field: 'user_id' },
+  as: 'budgets',
+  onDelete: 'CASCADE'
+});
+Budget.belongsTo(User, {
+  foreignKey: { name: 'userId', allowNull: false, field: 'user_id' },
+  as: 'user'
+});
+
+export { sequelize, User, Transaction, Budget };

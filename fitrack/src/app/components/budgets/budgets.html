@@ -1,0 +1,140 @@
+<div class="p-6 lg:p-8 space-y-6">
+
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Budgets</h1>
+      <p class="text-sm text-slate-500 mt-1">Track your spending against goals</p>
+    </div>
+    <button (click)="openAdd()"
+            class="inline-flex items-center gap-2 px-4 py-2.5 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold rounded-xl transition">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      New Budget
+    </button>
+  </div>
+
+  @if (successMessage()) {
+    <div class="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 rounded-xl text-sm text-emerald-600 font-medium">{{ successMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+      @for (i of [1,2,3]; track i) {
+        <div class="animate-pulse h-40 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"></div>
+      }
+    </div>
+  } @else if (budgets().length === 0) {
+    <div class="text-center py-20 text-slate-400">
+      <p class="text-lg font-medium">No budgets set yet</p>
+      <p class="text-sm mt-1">Create your first budget to track spending against goals</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+      @for (b of budgets(); track b.id) {
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/40 p-5 shadow-sm">
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white">{{ b.category }}</h3>
+              <p class="text-xs text-slate-400 mt-0.5 capitalize">{{ b.period }} budget</p>
+            </div>
+            <div class="flex gap-1">
+              <button (click)="openEdit(b)" class="p-1.5 text-slate-400 hover:text-teal-500 hover:bg-teal-50 rounded-lg transition">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              <button (click)="confirmDelete(b.id!)" class="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="mb-3">
+            <div class="flex justify-between text-xs text-slate-500 mb-1.5">
+              <span>₹{{ b.spent | number:'1.0-0' }} spent</span>
+              <span>₹{{ b.amount_limit | number:'1.0-0' }} limit</span>
+            </div>
+            <div class="h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-700"
+                   [class]="statusColor(b)"
+                   [style.width.%]="getPercentageWidth(b.percentage)"></div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold"
+                  [class.text-emerald-500]="b.percentage < 75"
+                  [class.text-amber-500]="b.percentage >= 75 && b.percentage < 100"
+                  [class.text-rose-500]="b.percentage >= 100">
+              {{ b.percentage }}% used
+            </span>
+            <span class="text-xs text-slate-400">
+              @if (b.remaining >= 0) { ₹{{ b.remaining | number:'1.0-0' }} left }
+              @else { ₹{{ -b.remaining | number:'1.0-0' }} over }
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="closeModal()">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700" (click)="$event.stopPropagation()">
+      <div class="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-700">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">{{ editingId() ? 'Edit' : 'New' }} Budget</h2>
+        <button (click)="closeModal()" class="text-slate-400 hover:text-slate-600 transition">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="p-6 space-y-4">
+        @if (errorMessage()) {
+          <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-600">{{ errorMessage() }}</div>
+        }
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Category *</label>
+          <select formControlName="category" class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500">
+            @for (c of categories; track c) { <option [value]="c">{{ c }}</option> }
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Budget Limit (₹) *</label>
+            <input type="number" formControlName="amount_limit" placeholder="0.00" step="0.01"
+                   class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Period *</label>
+            <select formControlName="period" class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500">
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Start Date *</label>
+          <input type="date" formControlName="start_date"
+                 class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"/>
+        </div>
+        <button type="submit" [disabled]="form.invalid || isSubmitting()"
+                class="w-full py-3 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition">
+          {{ isSubmitting() ? 'Saving...' : (editingId() ? 'Save Changes' : 'Create Budget') }}
+        </button>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirm -->
+@if (deleteConfirmId()) {
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm border border-slate-200 dark:border-slate-700 text-center">
+      <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">Delete Budget?</h3>
+      <p class="text-sm text-slate-500 mb-5">This will remove the budget goal permanently.</p>
+      <div class="flex gap-3">
+        <button (click)="cancelDelete()" class="flex-1 py-2.5 text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 transition">Cancel</button>
+        <button (click)="doDelete()" class="flex-1 py-2.5 text-sm font-semibold bg-rose-500 hover:bg-rose-600 text-white rounded-xl transition">Delete</button>
+      </div>
+    </div>
+  </div>
+}

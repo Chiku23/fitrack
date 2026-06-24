@@ -1,20 +1,22 @@
 <div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 px-4 py-12 sm:px-6 lg:px-8 transition-colors duration-300">
-  <div class="max-w-md w-full space-y-8 bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700/50">
+  <div class="max-w-md w-full space-y-8 bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700/50">
     
     <div class="text-center">
       <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-        Sign in to FiTrack
+        Sign In
       </h2>
       <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-        Access your decentralized financial ledger workspace
+        Access your personal finance tracker
       </p>
     </div>
 
-    <div *ngIf="errorMessage" class="p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50 rounded-xl">
-      <p class="text-sm text-rose-600 dark:text-rose-400 font-medium">
-        {{ errorMessage }}
-      </p>
-    </div>
+    @if (errorMessage()) {
+      <div class="p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50 rounded-xl">
+        <p class="text-sm text-rose-600 dark:text-rose-400 font-medium">
+          {{ errorMessage() }}
+        </p>
+      </div>
+    }
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
       <div class="space-y-5">
@@ -26,12 +28,14 @@
             id="email_input" 
             type="email" 
             formControlName="email" 
-            class="block w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition duration-200 text-sm"
+            class="block w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand text-sm"
             placeholder="name@example.com"
           />
-          <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="mt-1.5 text-xs text-rose-500 font-medium">
-            Please input a structured email address.
-          </div>
+          @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+            <div class="mt-1.5 text-xs text-rose-500 font-medium">
+              Please enter a valid email address.
+            </div>
+          }
         </div>
 
         <div>
@@ -42,31 +46,33 @@
             id="password_input" 
             type="password" 
             formControlName="password" 
-            class="block w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition duration-200 text-sm"
+            class="block w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand text-sm"
             placeholder="••••••••"
           />
-          <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="mt-1.5 text-xs text-rose-500 font-medium">
-            Password parameters must meet the 8-character structural baseline.
-          </div>
+          @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+            <div class="mt-1.5 text-xs text-rose-500 font-medium">
+              Password must be at least 8 characters long.
+            </div>
+          }
         </div>
       </div>
 
       <div>
         <button 
           type="submit" 
-          [disabled]="loginForm.invalid || isSubmitting" 
-          class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-brand hover:bg-brand-light dark:hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
+          [disabled]="loginForm.invalid || isSubmitting()" 
+          class="w-full flex justify-center py-3 px-4 text-sm font-semibold rounded-xl text-white bg-brand hover:bg-brand-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand disabled:opacity-50 transition duration-200"
         >
-          {{ isSubmitting ? 'Verifying Identity...' : 'Access Dashboard' }}
+          {{ isSubmitting() ? 'Signing in...' : 'Sign In' }}
         </button>
       </div>
     </form>
 
     <div class="text-center mt-4">
       <p class="text-sm text-slate-500 dark:text-slate-400">
-        New to the platform? 
-        <a routerLink="/register" class="font-medium text-brand hover:text-brand-light dark:hover:text-brand-dark transition duration-150">
-          Create a secure profile
+        New to FiTrack? 
+        <a routerLink="/register" class="font-medium text-brand hover:text-brand-light transition duration-150">
+          Create an account
         </a>
       </p>
     </div>

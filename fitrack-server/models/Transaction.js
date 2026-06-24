@@ -13,16 +13,12 @@ Transaction.init(
     description: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
+      validate: { notEmpty: true },
     },
     amount: {
-      type: DataTypes.DECIMAL(12, 2), // Stores financial values up to 9,999,999,999.99 securely without floating-point errors
+      type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
-      validate: {
-        isNumeric: true,
-      },
+      validate: { isNumeric: true },
     },
     type: {
       type: DataTypes.ENUM('income', 'expense'),
@@ -31,14 +27,26 @@ Transaction.init(
     category: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
+      validate: { notEmpty: true },
     },
     date: {
-      type: DataTypes.DATEONLY, // Enforces YYYY-MM-DD storage format to prevent local time shifting
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
+    notes: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    payment_method: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    source: {
+      type: DataTypes.ENUM('manual', 'import'),
+      defaultValue: 'manual',
+      allowNull: false,
+    },
+    // userId is added via association in index.js
   },
   {
     sequelize,

@@ -1,13 +1,21 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
 
 @theme {
-  /* Class-based dark mode registration */
   --variant-dark: .dark &;
-
-  /* Custom enterprise brand colors matching our specs */
   --color-brand-light: #0f766e;
   --color-brand: #0d9488;
   --color-brand-dark: #14b8a6;
 }
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Thin custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.dark ::-webkit-scrollbar-thumb { background: #334155; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }

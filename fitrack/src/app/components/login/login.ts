@@ -1,20 +1,19 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth'; // Explicitly references auth.ts
+import { AuthService } from '../../services/auth'; // Matches your custom flat file naming convention
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  errorMessage: string | null = null;
-  isSubmitting = false;
+  errorMessage = signal<string | null>(null);
+  isSubmitting = signal<boolean>(false);
 
   constructor(
     private fb: FormBuilder,
@@ -32,21 +31,31 @@ export class LoginComponent {
       return;
     }
 
-    this.isSubmitting = true;
-    this.errorMessage = null;
+    this.isSubmitting.set(true);
+    this.errorMessage.set(null);
 
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
         if (response.success) {
           this.router.navigate(['/dashboard']);
         } else {
-          this.errorMessage = response.error || 'Authentication failure occurred.';
+          this.errorMessage.set(response.error || 'Login failed.');
+          this.isSubmitting.set(false);
         }
-        this.isSubmitting = false;
       },
       error: (err) => {
-        this.errorMessage = err.error?.error || 'A network communication fault was encountered.';
-        this.isSubmitting = false;
+        this.isSubmitting.set(false); 
+        
+        // Extract the explicit server error message if it exists in the backend response body
+        if (err.error && err.error.error) {
+          this.errorMessage.set(err.error.error);
+        } else if (err.status === 401) {
+          this.errorMessage.set('Invalid email or password.');
+        } else if (err.status === 404) {
+          this.errorMessage.set('Account not found.');
+        } else {
+          this.errorMessage.set('A network error occurred. Please try again.');
+        }
       }
     });
   }

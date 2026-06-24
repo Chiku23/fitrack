@@ -7,12 +7,12 @@ export const register = async (req, res) => {
     const { email, password, base_currency, timezone } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ success: false, error: 'Required validation inputs missing.' });
+      return res.status(400).json({ success: false, error: 'Email and password are required.' });
     }
 
     const accountExists = await User.findOne({ where: { email } });
     if (accountExists) {
-      return res.status(400).json({ success: false, error: 'Identity designation resource already allocated.' });
+      return res.status(400).json({ success: false, error: 'An account with this email already exists.' });
     }
 
     const saltRounds = 10;
@@ -29,7 +29,7 @@ export const register = async (req, res) => {
 
     return res.status(201).json({ success: true, data: newUser });
   } catch (error) {
-    return res.status(500).json({ success: false, error: 'Internal system fault: ' + error.message });
+    return res.status(500).json({ success: false, error: 'Server error: ' + error.message });
   }
 };
 
@@ -38,21 +38,21 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ success: false, error: 'Required validation inputs missing.' });
+      return res.status(400).json({ success: false, error: 'Email and password are required.' });
     }
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(401).json({ success: false, error: 'Authentication criteria confirmation failure.' });
+      return res.status(401).json({ success: false, error: 'Invalid email or password.' });
     }
 
     if (user.status === 'locked' || user.status === 'suspended') {
-      return res.status(403).json({ success: false, error: 'Account access has been administratively restricted.' });
+      return res.status(403).json({ success: false, error: 'Account access is restricted.' });
     }
 
     const credentialIsValid = await bcrypt.compare(password, user.password);
     if (!credentialIsValid) {
-      return res.status(401).json({ success: false, error: 'Authentication criteria confirmation failure.' });
+      return res.status(401).json({ success: false, error: 'Invalid email or password.' });
     }
 
     const token = jwt.sign(
@@ -63,6 +63,6 @@ export const login = async (req, res) => {
 
     return res.status(200).json({ success: true, token });
   } catch (error) {
-    return res.status(500).json({ success: false, error: 'Internal system fault: ' + error.message });
+    return res.status(500).json({ success: false, error: 'Server error: ' + error.message });
   }
 };

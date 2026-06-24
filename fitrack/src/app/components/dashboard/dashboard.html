@@ -1,121 +1,99 @@
-<div class="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300">
-  
-  <nav class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50 transition-colors">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16 items-center">
-        <span class="text-xl font-bold tracking-tight text-brand">FiTrack</span>
-        <button class="px-4 py-2 text-sm font-semibold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
-          Sign Out
-        </button>
-      </div>
-    </div>
-  </nav>
+<div class="p-6 lg:p-8 space-y-8">
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-8">
-      
-      <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/40 shadow-sm shadow-slate-200/40 dark:shadow-none">
-        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Net Operational Balance</p>
-        <p class="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-          ₹{{ netBalance | number:'1.2-2' }}
-        </p>
-      </div>
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Your financial overview at a glance</p>
+  </div>
 
-      <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/40 shadow-sm shadow-slate-200/40 dark:shadow-none">
-        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Period Income</p>
-        <p class="mt-2 text-3xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
-          ₹{{ totalIncome | number:'1.2-2' }}
-        </p>
-      </div>
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
 
-      <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/40 shadow-sm shadow-slate-200/40 dark:shadow-none">
-        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Accumulated Expenses</p>
-        <p class="mt-2 text-3xl font-bold tracking-tight text-rose-600 dark:text-rose-400">
-          ₹{{ totalExpense | number:'1.2-2' }}
-        </p>
-      </div>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/40 p-5 shadow-sm">
+      <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Net Balance</p>
+      <p class="mt-2 text-3xl font-bold" [class.text-emerald-500]="netBalance() >= 0" [class.text-rose-500]="netBalance() < 0">
+        ₹{{ netBalance() | number:'1.2-2' }}
+      </p>
+      <p class="mt-1 text-xs text-slate-400">Current period</p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      
-      <div class="lg:col-span-1 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/40 shadow-sm shadow-slate-200/40 dark:shadow-none h-fit">
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Log New Entry</h3>
-        
-        <form [formGroup]="transactionForm" (ngSubmit)="onAddTransaction()" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Description</label>
-            <input type="text" formControlName="description" class="block w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent text-sm" placeholder="e.g., Office Supplies" />
-          </div>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/40 p-5 shadow-sm">
+      <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Income</p>
+      <p class="mt-2 text-3xl font-bold text-emerald-500">₹{{ totalIncome() | number:'1.2-2' }}</p>
+      <p class="mt-1 text-xs text-slate-400">This period</p>
+    </div>
 
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Amount (INR)</label>
-            <input type="number" formControlName="amount" class="block w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent text-sm" placeholder="0.00" />
-          </div>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/40 p-5 shadow-sm">
+      <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Expenses</p>
+      <p class="mt-2 text-3xl font-bold text-rose-500">₹{{ totalExpense() | number:'1.2-2' }}</p>
+      <p class="mt-1 text-xs text-slate-400">This period</p>
+    </div>
 
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Entry Class Type</label>
-            <div class="grid grid-cols-2 gap-3">
-              <label class="flex items-center justify-center py-2.5 border rounded-xl cursor-pointer text-sm font-medium transition" 
-                     [ngClass]="transactionForm.get('type')?.value === 'expense' ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/20 dark:border-rose-800' : 'border-slate-200 dark:border-slate-700'">
-                <input type="radio" formControlName="type" value="expense" class="sr-only" /> Expense
-              </label>
-              <label class="flex items-center justify-center py-2.5 border rounded-xl cursor-pointer text-sm font-medium transition"
-                     [ngClass]="transactionForm.get('type')?.value === 'income' ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/20 dark:border-emerald-800' : 'border-slate-200 dark:border-slate-700'">
-                <input type="radio" formControlName="type" value="income" class="sr-only" /> Income
-              </label>
-            </div>
-          </div>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/40 p-5 shadow-sm">
+      <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Savings Rate</p>
+      <p class="mt-2 text-3xl font-bold" [class.text-emerald-500]="savingsRate() >= 20" [class.text-amber-500]="savingsRate() > 0 && savingsRate() < 20" [class.text-rose-500]="savingsRate() <= 0">
+        {{ savingsRate() }}%
+      </p>
+      <p class="mt-1 text-xs text-slate-400">of income saved</p>
+    </div>
+  </div>
 
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Category Assignment</label>
-            <select formControlName="category" class="block w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent text-sm cursor-pointer">
-              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-            </select>
-          </div>
+  <!-- Chart + Recent transactions -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Value Settlement Date</label>
-            <input type="date" formControlName="date" class="block w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent text-sm" />
+    <!-- Bar Chart -->
+    <div class="xl:col-span-2 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/40 p-6 shadow-sm">
+      <h2 class="text-base font-bold text-slate-900 dark:text-white mb-4">Income vs Expenses (Last 6 Months)</h2>
+      <div class="h-64">
+        @if (monthlyTrend().length > 0) {
+          <canvas baseChart
+            [data]="barChartData()"
+            [options]="barChartOptions"
+            type="bar">
+          </canvas>
+        } @else {
+          <div class="flex items-center justify-center h-full text-slate-400 text-sm">
+            No data yet — add some transactions to see your chart
           </div>
+        }
+      </div>
+    </div>
 
-          <button type="submit" [disabled]="transactionForm.invalid" class="w-full py-3 px-4 text-sm font-semibold rounded-xl text-white bg-brand hover:bg-brand-light disabled:opacity-50 transition duration-200 mt-2">
-            Record Ledger Entry
-          </button>
-        </form>
+    <!-- Recent Transactions -->
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/40 p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-bold text-slate-900 dark:text-white">Recent Transactions</h2>
+        <a routerLink="/transactions" class="text-xs font-medium text-teal-600 hover:text-teal-500 transition">View all →</a>
       </div>
 
-      <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/40 shadow-sm shadow-slate-200/40 dark:shadow-none">
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Historical Transaction Activity Log</h3>
-        
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-sm">
-            <thead>
-              <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 text-xs font-semibold uppercase tracking-wider">
-                <th class="py-3 px-2">Date</th>
-                <th class="py-3 px-2">Description</th>
-                <th class="py-3 px-2">Category</th>
-                <th class="py-3 px-2 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
-              <tr *ngFor="let item of transactions" class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition">
-                <td class="py-3 px-2 font-mono text-slate-500 dark:text-slate-400">{{ item.date }}</td>
-                <td class="py-3 px-2 font-medium text-slate-900 dark:text-white">{{ item.description }}</td>
-                <td class="py-3 px-2">
-                  <span class="px-2.5 py-1 text-xs font-medium rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                    {{ item.category }}
-                  </span>
-                </td>
-                <td class="py-3 px-2 text-right font-semibold" [ngClass]="item.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
-                  {{ item.type === 'income' ? '+' : '-' }}₹{{ item.amount | number:'1.2-2' }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      @if (isLoading()) {
+        <div class="space-y-3">
+          @for (i of [1,2,3,4,5]; track i) {
+            <div class="animate-pulse h-10 bg-slate-100 dark:bg-slate-700 rounded-xl"></div>
+          }
         </div>
-      </div>
-
+      } @else if (recentTransactions().length === 0) {
+        <div class="text-center py-8 text-slate-400 text-sm">
+          <p>No transactions yet.</p>
+          <a routerLink="/transactions" class="mt-2 inline-block text-teal-500 hover:underline text-xs">Add your first →</a>
+        </div>
+      } @else {
+        <div class="space-y-3">
+          @for (t of recentTransactions(); track t.id) {
+            <div class="flex items-center justify-between py-2 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
+              <div class="min-w-0">
+                <p class="text-sm font-medium text-slate-900 dark:text-white truncate">{{ t.description }}</p>
+                <p class="text-xs text-slate-400">{{ t.category }} · {{ t.date }}</p>
+              </div>
+              <span class="ml-4 text-sm font-semibold flex-shrink-0"
+                    [class.text-emerald-500]="t.type === 'income'"
+                    [class.text-rose-500]="t.type === 'expense'">
+                {{ t.type === 'income' ? '+' : '-' }}₹{{ t.amount | number:'1.2-2' }}
+              </span>
+            </div>
+          }
+        </div>
+      }
     </div>
-  </main>
+  </div>
 </div>
